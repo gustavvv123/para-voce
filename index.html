@@ -430,6 +430,99 @@
     display: block;
     margin-bottom: 8px;
   }
+
+  /* ─── OVERLAY ─── */
+  #overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: radial-gradient(ellipse at center, #1A0408 0%, #0D0205 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+
+  #overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .overlay-inner {
+    text-align: center;
+    animation: overlayFadeIn 1.2s ease forwards;
+  }
+
+  @keyframes overlayFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .overlay-heart {
+    font-size: 5rem;
+    color: var(--rose);
+    text-shadow: 0 0 60px rgba(196,30,58,1), 0 0 120px rgba(196,30,58,0.4);
+    animation: overlayPulse 1.8s ease-in-out infinite;
+    display: block;
+    margin-bottom: 24px;
+  }
+
+  @keyframes overlayPulse {
+    0%, 100% { transform: scale(1); text-shadow: 0 0 60px rgba(196,30,58,1), 0 0 120px rgba(196,30,58,0.4); }
+    50% { transform: scale(1.12); text-shadow: 0 0 80px rgba(196,30,58,1), 0 0 160px rgba(196,30,58,0.6); }
+  }
+
+  .overlay-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-style: italic;
+    color: var(--cream);
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+
+  .overlay-sub {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-bottom: 50px;
+  }
+
+  .overlay-btn {
+    background: transparent;
+    border: 1px solid rgba(200,169,110,0.5);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 16px 48px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .overlay-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(139,0,0,0.3), rgba(196,30,58,0.2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .overlay-btn:hover::before { opacity: 1; }
+  .overlay-btn:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(139,0,0,0.4); }
+
+  .btn-heart { font-size: 1.2rem; }
+
 </style>
 </head>
 <body>
@@ -536,7 +629,7 @@
 <!-- Music Player -->
 <div class="music-player">
   <div class="music-label">🎵 Cazuza — Exagerado</div>
-  <button class="music-btn" onclick="toggleMusic()" title="Tocar música">🎵</button>
+  <button class="music-btn" onclick="toggleMusic()" title="Tocar música" id="musicBtn">🎵</button>
 </div>
 <iframe
   id="yt-frame"
@@ -545,6 +638,19 @@
   allowfullscreen
   frameborder="0"
 ></iframe>
+
+<!-- Entrance Overlay -->
+<div id="overlay">
+  <div class="overlay-inner">
+    <div class="overlay-heart">♥</div>
+    <h2 class="overlay-title">Para Você</h2>
+    <p class="overlay-sub">uma mensagem com todo o meu amor</p>
+    <button class="overlay-btn" onclick="enterSite()">
+      <span>Abrir</span>
+      <span class="btn-heart">🌹</span>
+    </button>
+  </div>
+</div>
 
 <script>
   // ─── FLOATING HEARTS ───
@@ -572,16 +678,24 @@
   let playing = false;
   const frame = document.getElementById('yt-frame');
 
+  function enterSite() {
+    document.getElementById('overlay').classList.add('hidden');
+    // Autoplay music after user interaction
+    frame.src = 'https://www.youtube.com/embed/yfB-0xGz-pg?autoplay=1&rel=0&controls=0';
+    playing = true;
+    document.getElementById('musicBtn').textContent = '⏸';
+  }
+
   function toggleMusic() {
     if (!playing) {
-      frame.src = 'https://www.youtube.com/embed/yfB-0xGz-pg?autoplay=1&rel=0';
+      frame.src = 'https://www.youtube.com/embed/yfB-0xGz-pg?autoplay=1&rel=0&controls=0';
       frame.style.display = 'block';
-      document.querySelector('.music-btn').textContent = '⏸';
+      document.getElementById('musicBtn').textContent = '⏸';
       playing = true;
     } else {
       frame.src = '';
       frame.style.display = 'none';
-      document.querySelector('.music-btn').textContent = '🎵';
+      document.getElementById('musicBtn').textContent = '🎵';
       playing = false;
     }
   }
